@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/GazpachoGit/sso/internal/app"
 	"github.com/GazpachoGit/sso/internal/config"
 )
 
@@ -24,8 +25,15 @@ func main() {
 	log.Info("Starting application", slog.String("env", cfg.Env))
 
 	//init app
+	application := app.New(
+		log,
+		cfg.GRPC.Port,
+		cfg.StoragePath,
+		cfg.TokenTTL,
+	)
 
 	//run gRPC server
+	application.GRPCSrv.Run()
 
 }
 
