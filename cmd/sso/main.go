@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/GazpachoGit/sso/internal/app"
 	"github.com/GazpachoGit/sso/internal/config"
@@ -33,7 +35,13 @@ func main() {
 	)
 
 	//run gRPC server
-	application.GRPCSrv.Run()
+	go application.GRPCSrv.Run()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	sign := <-stop
+	log.Info("Received shutdown signal", slog.String("signal", sign.String()))
+	application.GRPCSrv.Stop()
 
 }
 

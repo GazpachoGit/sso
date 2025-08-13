@@ -50,7 +50,7 @@ func (a *App) Run() error {
 func (a *App) Stop() {
 	const op = "grpcapp.Stop"
 	log := a.log.With(slog.String("op", op))
-	log.Info("stopping grpc server", slog.Int("port", a.port))
+	log.Info("stopping grpc server")
 	a.gRPCServer.GracefulStop()
 	log.Info("grpc server was stopped gracefully")
 }
