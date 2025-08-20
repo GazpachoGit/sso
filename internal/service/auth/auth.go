@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/GazpachoGit/sso/internal/domain/models"
+	"github.com/GazpachoGit/sso/internal/lib/jwt"
 	"github.com/GazpachoGit/sso/internal/lib/logger/sl"
 	"github.com/GazpachoGit/sso/internal/storage"
 	"golang.org/x/crypto/bcrypt"
@@ -29,11 +30,13 @@ type UserSaver interface {
 	SaveUser(ctx context.Context, email string, passHash []byte) (int64, error)
 }
 
+// getter service interface
 type UserProvider interface {
 	User(ctx context.Context, email string) (*models.User, error)
 	IsAdmin(ctx context.Context, userID int64) (bool, error)
 }
 
+// getter service interface
 type AppProvider interface {
 	App(ctx context.Context, appID int64) (*models.App, error)
 }
@@ -72,7 +75,16 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 	}
 	app, err := a.appProvider.App(ctx, int64(appID))
 	if err != nil {
+		log.Info("invalid app id", sl.Err(err))
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
+	log.Info("user logged in successfully")
+	jwt, err := jwt.NewToken(user, app, a.tokenTTL)
+	if err != nil {
+		log.Error("can't generate JWT", sl.Err(err))
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+	return jwt, nil
 }
 
 func (a *Auth) RegisterNewUser(ctx context.Context, email string, password string) (userID int64, err error) {
@@ -88,12 +100,12 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, password strin
 	passHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Error("failed to generate password hash", sl.Err(err))
-		return 0, err
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	userID, err = a.userSaver.SaveUser(ctx, email, passHash)
 	if err != nil {
 		log.Error("failed to save user", sl.Err(err))
-		return 0, err
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	log.Info("user registered successfully", slog.Int64("userID", userID))
 	return userID, nil
