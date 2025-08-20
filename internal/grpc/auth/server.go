@@ -20,8 +20,8 @@ type serverAPI struct {
 	auth Auth
 }
 
-func Register(gRPC *grpc.Server) {
-	ssov1.RegisterAuthServer(gRPC, &serverAPI{})
+func Register(gRPCServer *grpc.Server, auth Auth) {
+	ssov1.RegisterAuthServer(gRPCServer, &serverAPI{auth: auth})
 }
 
 func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*ssov1.RegisterResponse, error) {
