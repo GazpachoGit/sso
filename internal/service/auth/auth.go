@@ -16,6 +16,8 @@ import (
 
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrInvalidAppID       = errors.New("invalid app id")
+	ErrUserExists         = errors.New("user exists")
 )
 
 type Auth struct {
@@ -75,6 +77,10 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 	}
 	app, err := a.appProvider.App(ctx, int64(appID))
 	if err != nil {
+		if errors.Is(err, storage.ErrAppNotFound) {
+			log.Warn("app not found", slog.Int("appID", appID), sl.Err(err))
+			return "", fmt.Errorf("%s: %w", op, ErrInvalidAppID)
+		}
 		log.Info("invalid app id", sl.Err(err))
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
@@ -104,6 +110,10 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, password strin
 	}
 	userID, err = a.userSaver.SaveUser(ctx, email, passHash)
 	if err != nil {
+		if errors.Is(err, storage.ErrUserExists) {
+			log.Warn("user exists", sl.Err(err))
+			return 0, fmt.Errorf("%s: %w", op, ErrUserExists)
+		}
 		log.Error("failed to save user", sl.Err(err))
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
