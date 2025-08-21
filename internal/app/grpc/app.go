@@ -33,7 +33,6 @@ func New(log *slog.Logger, authService authgrpc.Auth, port int) *App {
 func (a *App) Run() error {
 	const op = "grpcapp.Run"
 	log := a.log.With(slog.String("op", op), slog.Int("port", a.port))
-
 	log.Info("starting grpc server")
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
