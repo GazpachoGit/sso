@@ -19,5 +19,11 @@ tasks:
     desc: register new user. USAGE NAME="c@a.a" task register 
     cmds:
       - grpcurl -plaintext -d '{"username":"{{.NAME}}", "password":"123"}' localhost:44044 auth.Auth/Register
+  login:
+    aliases:
+      - login
+    desc: login user. USAGE NAME="c@a.a" task login 
+    cmds:
+      - "grpcurl -plaintext -d '{\"email\":\"{{.NAME}}\", \"password\":\"123\", \"app_id\": 1}' localhost:44044 auth.Auth/Login"
       
       
