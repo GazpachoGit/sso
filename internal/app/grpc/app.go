@@ -7,6 +7,7 @@ import (
 
 	authgrpc "github.com/GazpachoGit/sso/internal/grpc/auth"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 // GRPC application (server)
@@ -20,6 +21,7 @@ func New(log *slog.Logger, authService authgrpc.Auth, port int) *App {
 	gRPCServer := grpc.NewServer()
 
 	authgrpc.Register(gRPCServer, authService)
+	reflection.Register(gRPCServer)
 
 	return &App{
 		log:        log,

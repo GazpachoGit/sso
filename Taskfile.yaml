@@ -12,4 +12,12 @@ tasks:
       - run
     desc: run grpc service
     cmds:
-      - go run ./cmd/sso --conf="./config/local.yml" 
+      - go run ./cmd/sso --conf="./config/local.yml"
+  register:
+    aliases:
+      - register
+    desc: register new user. USAGE NAME="c@a.a" task register 
+    cmds:
+      - grpcurl -plaintext -d '{"username":"{{.NAME}}", "password":"123"}' localhost:44044 auth.Auth/Register
+      
+      
