@@ -1,0 +1,15 @@
+version: "3"
+
+tasks:
+  migrate:
+    aliases:
+      - migrate
+    desc: Run migration utility
+    cmds:
+      - go run ./cmd/migrator -storage-path="./storage/storage.db" -migrations-path="./migrations"
+  run:
+    aliases:
+      - run
+    desc: run grpc service
+    cmds:
+      - go run ./cmd/sso --conf="./config/local.yml" 

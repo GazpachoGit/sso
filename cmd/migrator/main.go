@@ -16,8 +16,10 @@ func main() {
 	var storagePath, migrationsPath, migrationsTable string
 
 	flag.StringVar(&storagePath, "storage-path", "", "")
-	flag.StringVar(&migrationsPath, "storage-path", "", "")
-	flag.StringVar(&migrationsTable, "storage-path", "", "")
+	flag.StringVar(&migrationsPath, "migrations-path", "", "")
+	flag.StringVar(&migrationsTable, "migration-table", "", "")
+
+	flag.Parse()
 
 	if storagePath == "" {
 		panic("empty storagePath")
