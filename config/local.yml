@@ -4,6 +4,6 @@ token_ttl: 1h
 grpc:
   port: 44044
   timeout: 10h
-  insecure: false
+  insecure: true
   certificate-path: "./config/server.crt"
   key-path: "./config/server.key"
