@@ -16,8 +16,11 @@ type Config struct {
 }
 
 type GRPCConfig struct {
-	Port    int           `yaml:"port" env-default:"44044"`
-	Timeout time.Duration `yaml:"timeout" env-default:"10h"`
+	Port            int           `yaml:"port" env-default:"44044"`
+	Timeout         time.Duration `yaml:"timeout" env-default:"10h"`
+	Insecure        bool          `yaml:"insecure"`
+	CertificatePath string        `yaml:"certificate-path"`
+	KeyPath         string        `yaml:"key-path"`
 }
 
 func MustLoad() *Config {
@@ -31,6 +34,11 @@ func MustLoad() *Config {
 	cfg := &Config{}
 	if err := cleanenv.ReadConfig(path, cfg); err != nil {
 		panic(err)
+	}
+	if !cfg.GRPC.Insecure {
+		if cfg.GRPC.CertificatePath == "" || cfg.GRPC.KeyPath == "" {
+			panic("secure mode without CertificatePath or KeyPath in the config")
+		}
 	}
 	return cfg
 }

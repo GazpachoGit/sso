@@ -7,6 +7,7 @@ import (
 
 	authgrpc "github.com/GazpachoGit/sso/internal/grpc/auth"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -17,8 +18,19 @@ type App struct {
 	port       int
 }
 
-func New(log *slog.Logger, authService authgrpc.Auth, port int) *App {
-	gRPCServer := grpc.NewServer()
+func New(log *slog.Logger, authService authgrpc.Auth, port int, certificatePath string, keyPath string) *App {
+	var gRPCServer *grpc.Server = nil
+	if certificatePath != "" && keyPath != "" {
+		log.Info("secure mode detected")
+		creds, err := credentials.NewServerTLSFromFile(certificatePath, keyPath)
+		if err != nil {
+			//TODO: return error
+			panic("can't use the certificate and key to create credentials")
+		}
+		gRPCServer = grpc.NewServer(grpc.Creds(creds))
+	} else {
+		gRPCServer = grpc.NewServer()
+	}
 
 	authgrpc.Register(gRPCServer, authService)
 	reflection.Register(gRPCServer)

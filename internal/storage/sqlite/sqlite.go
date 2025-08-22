@@ -8,8 +8,7 @@ import (
 
 	"github.com/GazpachoGit/sso/internal/domain/models"
 	"github.com/GazpachoGit/sso/internal/storage"
-
-	"github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Storage struct {
@@ -42,11 +41,6 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 
 	res, err := stmt.ExecContext(ctx, email, passHash)
 	if err != nil {
-		var sqliteErr sqlite3.Error
-		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserExists)
-		}
-
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 

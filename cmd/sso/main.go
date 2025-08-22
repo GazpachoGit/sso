@@ -10,7 +10,7 @@ import (
 	"github.com/GazpachoGit/sso/internal/app"
 	"github.com/GazpachoGit/sso/internal/config"
 )
-//tt
+
 const (
 	envLocal = "local"
 	envDev   = "dev"
@@ -32,6 +32,8 @@ func main() {
 		cfg.GRPC.Port,
 		cfg.StoragePath,
 		cfg.TokenTTL,
+		cfg.GRPC.CertificatePath,
+		cfg.GRPC.KeyPath,
 	)
 
 	//run gRPC server
